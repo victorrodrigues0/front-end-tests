@@ -11,10 +11,11 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Pencil } from "lucide-react"
 import { ReactNode } from "react"
 
 type ModalProps = {
-    btnText: string,
+    btnText?: string,
     titleText: string,
     description?: string,
     classDeleteBtn?: string
@@ -27,10 +28,16 @@ export function Modal({
     btnText, titleText, description, classDeleteBtn, classSaveBtn, btnFunction, children
 }: ModalProps) {
     return (
-            <Dialog>
+        <Dialog>
             <form>
                 <DialogTrigger asChild>
-                    <Button variant="outline">{btnText}</Button>
+                    <Button variant="default" className="cursor-pointer">
+                        {!btnText &&
+                            < Pencil className="h-3" />
+                        }
+
+                        {btnText}
+                    </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>

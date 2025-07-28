@@ -12,6 +12,7 @@ import { taskReducerProps } from '@/types/todo/taskReducer';
 import { TodoItem } from '@/types/todo/todo';
 import { Dialog } from '@radix-ui/react-dialog';
 import { Label } from '@radix-ui/react-label';
+import { todo } from 'node:test';
 import React, { useEffect, useReducer, useRef, useState } from 'react'
 import { toast, Toaster } from 'sonner';
 
@@ -20,8 +21,6 @@ const Page = () => {
   const [date, setDate] = React.useState<Date>(new Date())
   const [createTaskDescription, setcreateTaskDescription] = useState('');
   const [listToDo, dispatch] = useReducer(taskReducer, todoList);
-  const [toastMessage, setToastMessage] = useState(false);
-  const refModal = useRef<HTMLElement>(null);
   const [search, setSearch] = useState('');
 
   const filterToDo = search.length === 0 ? listToDo :
@@ -65,13 +64,35 @@ const Page = () => {
       }
     })
 
-    toast("Task deletado", {
-      description: `Task foi removida com sucesso.`,
+    toast("Task Deletada", {
+      description: `Task Deletada com sucesso.`,
       action: {
         label: "Feito",
         onClick: () => console.log("Toast confirmado"),
       },
     });
+  }
+  const handleOnUpdate = (toDo: TodoItem) => {
+    dispatch({
+      type: 'update',
+      payload: {
+        id: toDo.id,
+        title: toDo.title,
+        completed: toDo.completed,
+        dueDate: toDo.dueDate
+      }
+    })
+
+    toast("Task Editada", {
+      description: `Task Editada com sucesso.`,
+      action: {
+        label: "Feito",
+        onClick: () => console.log("Toast confirmado"),
+      },
+    });
+
+    
+
   }
 
   return (
@@ -110,6 +131,7 @@ const Page = () => {
                 todo={item}
                 onToggle={() => handleToggleStatus(item.id)}
                 onDelete={() => handleOnDelete(item.id)}
+                onUpdate={handleOnUpdate}
               />
             </div>
           )}

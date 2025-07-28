@@ -35,11 +35,20 @@ function isValidDate(date: Date | undefined) {
 }
 
 
-export function DatePickerWithInput() {
+export function DatePickerWithInput({ dateToDo, onDateChange }: { dateToDo?: Date; onDateChange?: (date: Date) => void }) {
     const [open, setOpen] = React.useState(false)
-    const { date, setDate } = useTaskContext();
-    const [month, setMonth] = React.useState<Date | undefined>(date)
-    const [value, setValue] = React.useState(formatDate(date))
+    const { date: contextDate, setDate } = useTaskContext();
+    const [localDate, setLocalDate] = React.useState<Date>(dateToDo || contextDate);
+    const [month, setMonth] = React.useState<Date | undefined>(localDate)
+    const [value, setValue] = React.useState(() => localDate ? formatDate(localDate) : "")
+
+    React.useEffect(() => {
+        if (dateToDo) {
+            setLocalDate(dateToDo);
+            setValue(formatDate(dateToDo));
+            setMonth(dateToDo);
+        }
+    }, [dateToDo])
 
     return (
         <div className="flex flex-col gap-3">
@@ -53,8 +62,9 @@ export function DatePickerWithInput() {
                         const date = new Date(e.target.value)
                         setValue(e.target.value)
                         if (isValidDate(date)) {
-                            setDate(date)
+                            setLocalDate(date)
                             setMonth(date)
+                            onDateChange?.(date)
                         }
                     }}
                     onKeyDown={(e) => {
@@ -83,13 +93,15 @@ export function DatePickerWithInput() {
                     >
                         <Calendar
                             mode="single"
-                            selected={date}
+                            selected={localDate}
                             captionLayout="dropdown"
                             month={month}
                             onMonthChange={setMonth}
                             onSelect={(date) => {
-                                setDate((date ?? new Date()))
-                                setValue(formatDate(date))
+                                const selectedDate = date ?? new Date();
+                                setLocalDate(selectedDate)
+                                setValue(formatDate(selectedDate))
+                                onDateChange?.(selectedDate)
                                 setOpen(false)
                             }}
                         />

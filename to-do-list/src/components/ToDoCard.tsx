@@ -1,19 +1,27 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Trash } from "lucide-react";
+import { Calendar, Clock, Pen, Pencil, Trash } from "lucide-react";
 import { TodoItem } from "@/types/todo/todo";
 import { cn } from "@/lib/utils";
+import { Modal } from "./Modal";
+import { Label } from "@radix-ui/react-label";
+import { Input } from "./ui/input";
+import { DatePickerWithInput } from "./DatePickers/DatePickWithInput";
+import { useEffect, useState } from "react";
 
 interface TodoCardProps {
     todo: TodoItem;
-    onToggle: (id: number) => void;
-    onDelete: (id: number) => void
+    onToggle: (id: number) => void,
+    onDelete: (id: number) => void,
+    onUpdate: (toDo: TodoItem) => void
 }
 
-export const TodoCard = ({ todo, onToggle, onDelete }: TodoCardProps) => {
+export const TodoCard = ({ todo, onToggle, onDelete, onUpdate }: TodoCardProps) => {
     const isOverdue = new Date(todo.dueDate) < new Date() && !todo.completed;
     const isDueToday = new Date(todo.dueDate).toDateString() === new Date().toDateString();
+    const [fieldText, setFieldText] = useState(todo.title);
+    const [editDate, setEditDate] = useState(todo.dueDate);
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -70,12 +78,35 @@ export const TodoCard = ({ todo, onToggle, onDelete }: TodoCardProps) => {
                             )}
 
                         </div>
-                        <div className="w-full flex justify-end pr-5 cursor-pointer">
-                            <Badge variant="destructive" className="p-2"
+                        <div className="w-full flex justify-end pr-5 cursor-pointer gap-1">
+                            <Badge variant="destructive" className="p-2 px-3"
                                 onClick={() => onDelete(todo.id)}
                             >
                                 <Trash className="h-3 w-3" />
                             </Badge>
+                            <Modal
+                                titleText="Editar Tarefa"
+                                description="Edite sua tarefa"
+                                btnFunction={() => onUpdate({
+                                    ...todo,
+                                    title: fieldText,
+                                    dueDate: editDate
+                                })}
+                            >
+                                <div className="grid gap-3">
+                                    <Label htmlFor="description">Descrição</Label>
+                                    <Input id="description" name="description"
+                                        value={fieldText}
+                                        onChange={(e) => setFieldText(e.target.value)} />
+                                </div>
+                                <div className="grid gap-3">
+                                    <Label htmlFor="">Dia da semana</Label>
+                                    <DatePickerWithInput
+                                        dateToDo={editDate}
+                                        onDateChange={setEditDate}
+                                    />
+                                </div>
+                            </Modal>
                         </div>
                     </div>
                 </div>

@@ -20,7 +20,7 @@ export const taskReducer = (list: TodoItem[], actions: taskReducerProps) => {
                     return {
                         ...item,
                         title: actions.payload.title,
-                        completed: false,
+                        completed: actions.payload.completed,
                         dueDate: actions.payload.dueDate
                     }
                 } return item;
