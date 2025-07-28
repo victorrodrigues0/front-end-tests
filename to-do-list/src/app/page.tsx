@@ -1,181 +1,121 @@
 "use client"
 
-import { ButtonApp } from "@/components/Button";
-import { City } from "@/components/City";
-// import { Modal } from "@/components/Modal";
-import { Person } from "@/components/Person";
-import { Rating } from "@/components/Rating";
-import { User, users } from "@/data/usersList";
-import { ButtonHTMLAttributes, FormEvent, MouseEventHandler, useState } from "react";
+import { DatePickerWithInput } from '@/components/DatePickers/DatePickWithInput';
+import { Modal } from '@/components/Modal';
+import { TodoCard } from '@/components/ToDoCard';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { taskContext } from '@/context/task/taskContext';
+import { todoList } from '@/data/toDoList/to-do-list';
+import { taskReducer } from '@/reducers/taskReducer';
+import { taskReducerProps } from '@/types/todo/taskReducer';
+import { TodoItem } from '@/types/todo/todo';
+import { Dialog } from '@radix-ui/react-dialog';
+import { Label } from '@radix-ui/react-label';
+import React, { useEffect, useReducer, useRef, useState } from 'react'
+import { toast, Toaster } from 'sonner';
 
 const Page = () => {
 
+  const [date, setDate] = React.useState<Date>(new Date())
+  const [createTaskDescription, setcreateTaskDescription] = useState('');
+  const [listToDo, dispatch] = useReducer(taskReducer, todoList);
+  const [toastMessage, setToastMessage] = useState(false);
+  const refModal = useRef<HTMLElement>(null);
+  const [search, setSearch] = useState('');
 
-  const handleBtn = () => {
-    alert('salve');
-  }
+  const filterToDo = search.length === 0 ? listToDo :
+    listToDo.filter(item => item.title.includes(search));
 
-  const handleVisualizar = () => {
-    alert("Viu");
-  }
-
-  const handleformSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    alert("enviou");
-  }
-
-  const handleToggleModal = () => {
-    setModal(!modal);
-  }
-
-  const [modal, setModal] = useState(false);
-
-  const [search, setSearch] = useState<string>('');
-  const [list, setList] = useState<User[]>(users);
-  const [nameUser, setNameUser] = useState('');
-  const [userId, setUserId] = useState(0);
-  const [fieldNameUser, setFieldNameUser] = useState(false);
-
-  const usersFilter = list.filter(user => user.name.includes(search));
-
-  const handleDeletar = (id: number) => {
-    setList(list.filter(Element => Element.id !== id));
-  }
-  const handleEditar = (id: number, name: string) => {
-    setList(list.map(e => e.id === id ? { ...e, name: name } : e));
-  }
-  const handleEditarInput = (id: number) => {
-    setFieldNameUser(true);
-    setUserId(id)
-  }
-  return (
-    <div className="w-full h-full bg-amber-900 flex justify-center items-center gap-6 flex-col">
-
-
-      <input
-        type="text"
-        placeholder="Insira um nome"
-        className="border border-black bg-white"
-        onChange={e => (setSearch(e.target.value))}
-      />
-
-      {fieldNameUser &&
-        <div>
-          <input
-            type="text"
-            placeholder="Insira um nome"
-            className="border border-black bg-white"
-            onChange={e => (setNameUser(e.target.value))}
-          />
-          <button className="p-2 bg-red-300" onClick={() => handleEditar(userId, nameUser)}>editar</button>
-        </div>
+  const handleCreateTask = () => {
+    dispatch({
+      type: "add",
+      payload: {
+        title: createTaskDescription,
+        completed: false,
+        dueDate: date
       }
+    })
+
+    toast("Task Criada", {
+      description: `Task criada com sucesso.`,
+      action: {
+        label: "Feito",
+        onClick: () => console.log("Toast confirmado"),
+      },
+    });
+  }
 
 
+  const handleToggleStatus = (id: number) => {
+    dispatch({
+      type: 'toggle',
+      payload: {
+        id
+      }
+    })
+  }
 
-      <div className="flex flex-col gap-8">
-        {search == '' &&
+  const handleOnDelete = (id: number) => {
 
-          list.map(e =>
-            <div key={e.id} className="flex gap-3">
-              <p>{e.name}</p>
-              <button className="p-2 bg-red-300" onClick={() => handleDeletar(e.id)}>deletar</button>
-              <button className="p-2 bg-red-300" onClick={() => handleEditarInput(e.id)}>editar</button>
+    dispatch({
+      type: 'delete',
+      payload: {
+        id
+      }
+    })
+
+    toast("Task deletado", {
+      description: `Task foi removida com sucesso.`,
+      action: {
+        label: "Feito",
+        onClick: () => console.log("Toast confirmado"),
+      },
+    });
+  }
+
+  return (
+    <taskContext.Provider value={{ date, setDate }}>
+      <Toaster />
+      <div className='max-w-screen min-h-screen flex pt-10 text-black flex-col items-center gap-5'>
+        <div className='w-1/3 h-1/6 flex gap-6 justify-center '>
+          <Input
+            placeholder='Filtrar tarefa...'
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <Modal
+            btnText='Criar tarefa'
+            titleText='Criar tarefa'
+            classDeleteBtn='bg-red-500 text-white
+          hover:bg-red-600 hover:text-white'
+            btnFunction={handleCreateTask}
+          >
+            <div className="grid gap-3">
+              <Label htmlFor="description">Descrição</Label>
+              <Input id="description" name="description"
+                value={createTaskDescription}
+                onChange={(e) => setcreateTaskDescription(e.target.value)} />
             </div>
-
-          )}
-
-        {search !== '' &&
-
-          usersFilter.map(e =>
-            <div key={e.id}>
-              <p>{e.name}</p>
-              <ButtonApp
-                text="Excluir"
-              // click={ }
+            <div className="grid gap-3">
+              <Label htmlFor="">Dia da semana</Label>
+              <DatePickerWithInput />
+            </div>
+          </Modal>
+        </div>
+        <div className='w-2/3 h-5/6  grid grid-cols-3 gap-5'>
+          {filterToDo.map(item =>
+            <div key={item.id} className='grid'>
+              <TodoCard
+                todo={item}
+                onToggle={() => handleToggleStatus(item.id)}
+                onDelete={() => handleOnDelete(item.id)}
               />
             </div>
-
           )}
+        </div>
       </div>
-
-      {/* <p>
-        {search}
-      </p> */}
-
-
-      {/* <ButtonApp
-        color="bg-red-900"
-        text="Abrir modal"
-        click={ handleToggleModal}
-      />
-
-      {modal &&
-        <Modal
-        closeModal={handleToggleModal}
-        />
-      } */}
-
-
-      {/* <h1>Bem vindo</h1>
-
-      <Person
-        name="Victor"
-        age={18}
-        height={29.9}
-        gender="Masculino"
-      />
-
-      <br /><br />
-
-      {users.map(user =>
-        <div key={user.id}>
-          <p>{user.name} - {user.email}</p>
-        </div>
-      )}
-      <br />
-      <br />
-      <br />
-
-      {usersFilter.map(user =>
-        <div key={user.id}>
-          <p>{user.name} - {user.email}</p>
-        </div>
-      )}
-         */}
-
-      {/* <Rating
-      rate={2}
-      /> */}
-
-      {/* <ButtonApp
-        text="Visualizar"
-        click={handleVisualizar}
-      />
-
-      <ButtonApp
-        text="Editar"
-        color="bg-yellow-500"
-        click={handleEditar}
-      />
-
-      <ButtonApp
-        text="Excluir"
-        color="bg-red-500"
-        click={handleDeletar}
-      />
-
-      <form action="" onSubmit={handleformSubmit}>
-        <input type="text" className="p-4 bg-white" name="" id="" />
-        <ButtonApp
-          text="Enviar"
-          color="bg-sky-300"
-        />
-      </form> */}
-
-
-
-    </div >
+    </taskContext.Provider >
   )
 }
 
