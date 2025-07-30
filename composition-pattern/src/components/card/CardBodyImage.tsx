@@ -13,7 +13,7 @@ export const BodyCardImage = ({ src, alt, ...rest }: BodyCardImageProps) => {
             className={twMerge(`w-full h-[150px] flex justify-center`, rest.className)}
         >
             <img
-                className='h-full w-full object-cover rounded-sm'
+                className='h-full w-full object-cover'
                 src={src} alt={alt} />
         </div>
     )

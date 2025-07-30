@@ -9,7 +9,7 @@ export const CardFooter = ({ children, ...rest }: FooterCardProps) => {
     return (
         <footer
             {...rest}
-            className={twMerge(`w-full min-h-[15%] bg-pink-300`, rest.className)}
+            className={twMerge(`w-full text-sm p-1 text-gray-800`, rest.className)}
         >
             {children}
         </footer>

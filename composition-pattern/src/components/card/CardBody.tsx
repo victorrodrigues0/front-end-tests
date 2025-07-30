@@ -9,7 +9,7 @@ export const CardBody = ({ children, ...rest }: CardBodyProps) => {
     return (
         <div
             {...rest}
-            className={twMerge(`w-full min-h-[70%] bg-red-800`, rest.className)}>
+            className={twMerge(`w-full min-h-[70%]`, rest.className)}>
             {children}
         </div>
     )

@@ -9,7 +9,7 @@ export const CardIcon = ({ children, ...rest }: CardIconProps) => {
     return (
         <p
             {...rest}
-            className={twMerge(`size-5`, rest.className)}
+            className={twMerge(``, rest.className)}
         >
             {children}
         </p>

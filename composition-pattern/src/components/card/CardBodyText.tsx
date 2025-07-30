@@ -1,7 +1,18 @@
-import React from 'react'
+import React, { HTMLAttributes, ReactNode } from 'react'
+import { twMerge } from 'tailwind-merge'
 
-export const CardBodyText = () => {
+
+interface CardBodyTextProps extends HTMLAttributes<HTMLParagraphElement> {
+    children: ReactNode
+}
+
+export const CardBodyText = ({ children, ...rest }: CardBodyTextProps) => {
     return (
-        <div>CardBodyText</div>
+        <p
+        {...rest}
+        className={twMerge(`text-zinc-800 mx-3 my-1`, rest.className)}
+        >
+            {children}
+        </p>
     )
 }

@@ -5,6 +5,9 @@ import { CardIcon } from "./CardIcon";
 import { CardBody } from "./CardBody";
 import { BodyCardImage } from "./CardBodyImage";
 import { CardFooter } from "./CardFooter";
+import { CardBodyText } from "./CardBodyText";
+import { CardBodyButton } from "./CardBodyButton";
+import { CardFooterCreatedAt } from "./CardFooterCreatedAt";
 
 export const Card = {
     Root: CardRoot,
@@ -13,5 +16,8 @@ export const Card = {
     HeaderTitle: CardHeaderTitle,
     Body: CardBody,
     BodyImage: BodyCardImage,
-    Footer: CardFooter
+    BodyText: CardBodyText,
+    BodyButton: CardBodyButton,
+    Footer: CardFooter,
+    FooterCreatedAt: CardFooterCreatedAt
 }
